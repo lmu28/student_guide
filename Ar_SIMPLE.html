@@ -10,10 +10,16 @@
       <a-box position="0 0.5 0" material="color: red;"></a-box>
     </a-marker>
 
-
-    <a-marker  preset="kanji">
-      <a-text value="Hello, World!" position="0 1 0" color="blue"></a-text>
-    </a-marker>
+    <a-marker preset="kanji">
+      <a-entity position="0 0 0.5" rotation="0 0 0"> <!-- Позиция перед маркером -->
+          <a-text value="Hello, World!" 
+                   position="0 0 0" 
+                   rotation="315 0 0" 
+                   color="blue"  
+                   scale="2 2 2"></a-text>
+      </a-entity>
+  </a-marker>
+  
 
     
     <!-- Маркер с кастомным паттерном -->
