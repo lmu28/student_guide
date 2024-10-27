@@ -9,16 +9,23 @@
     <a-marker preset="hiro">
       <a-box position="0 0.5 0" material="color: red;"></a-box>
     </a-marker>
+
+
+    <a-marker  preset="kanji">
+      <a-text value="Hello, World!" position="0 1 0" color="blue"></a-text>
+    </a-marker>
+
     
     <!-- Маркер с кастомным паттерном -->
-    <a-marker type="pattern" url="pattern-1699643265893.patt">
-      <a-text value="Hello, World!" position="0 1 0" color="blue"></a-text>
+    <!-- <a-marker type="pattern" url="pattern-1699643265893.patt"> -->
+      <!-- <a-text value="Hello, World!" position="0 1 0" color="blue"></a-text> -->
       <!-- <a-sphere position="0 0.5 0" radius="0.25" color="blue"></a-sphere> -->
-    </a-marker>
+    <!-- </a-marker> -->
     
     <!-- Маркер типа "штрих-код" с числовым значением 5 -->
     <a-marker type="barcode" value="5">
-      <a-cylinder position="0 0.5 0" radius="0.3" height="0.5" color="green"></a-cylinder>
+      <a-box position="0 0.5 0" material="color: red;"></a-box>
+      <!-- <a-cylinder position="0 0.5 0" radius="0.3" height="0.5" color="green"></a-cylinder> -->
     </a-marker>
     
     <!-- Простая камера для отображения сцены -->
