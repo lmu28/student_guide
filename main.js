@@ -1,13 +1,37 @@
 
+
 document.addEventListener("DOMContentLoaded", () => {
+  
+    
     const video = document.getElementById("camera");
+    const canvas = document.createElement("canvas");
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
                 video.play();
-                startImageRecognition(video); // Передаем video как аргумент
+
+            
+
+
+                setInterval(async () => {
+                    try {
+                        var base64Content = captureFrame(video,canvas);
+
+                        console.log(base64Content);
+
+                        const data = await sendBase64Image(base64Content); // Дожидаемся результата
+                        processData(data); // Обрабатываем данные
+                    } catch (error) {
+                        console.error("Error processing data:", error); // Обрабатываем ошибку
+                    }
+                    console.log("Через 3 секунды");
+                }, 3000);
+
+    
+               
+                
             })
             .catch(err => console.error("Error accessing camera: " + err));
     } else {
@@ -15,42 +39,92 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function startImageRecognition(video) {
-    // Проверяем, что video действительно определено
-    if (!video) {
-        console.error("Video element is not defined.");
-        return;
-    }
 
-    // Интервал для отправки изображений на модель распознавания
-    setInterval(() => {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        
-        // Проверяем размеры видео
-        if (video.videoWidth === 0 || video.videoHeight === 0) {
-            console.error("Video dimensions are not valid.");
-            return;
+
+
+function placeTextAtCoordinates(x, y, text) {
+    const video = document.getElementById("camera");
+    const resultsContainer = document.getElementById("results");
+    const videoRect = video.getBoundingClientRect();
+
+
+    const scaledX = videoRect.left + (x * videoRect.width) / video.videoWidth;
+    const scaledY = videoRect.top + (y * videoRect.height) / video.videoHeight;
+
+   
+    const textElement = document.createElement("div");
+    textElement.textContent = text;
+    
+
+    textElement.style.position = "absolute";
+    textElement.style.left = `${scaledX}px`;
+    textElement.style.top = `${scaledY}px`;
+    textElement.style.color = "white";
+    textElement.style.background = "rgba(0, 0, 0, 0.7)";
+    textElement.style.padding = "5px";
+    textElement.style.borderRadius = "5px";
+    textElement.style.fontSize = "16px";
+
+
+    resultsContainer.appendChild(textElement);
+}
+
+
+function captureFrame(video, canvas) {
+    const context = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const base64Image = canvas.toDataURL("image/png");
+
+    return base64Image;
+
+}
+
+
+async function sendBase64Image(base64Image) {
+    const url = "http://89.223.68.28:8080/api/v1/recognition";
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ base64Content: base64Image }),
+        });
+
+        if (response.ok) {
+            const data = await response.json(); // Ждем получения JSON-ответа
+            // processData(data); // Обрабатываем данные
+            return data; // Возвращаем данные
+        } else {
+            console.error('Server returned an error:', response.status);
+            return null; // Возвращаем null в случае ошибки
         }
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL('image/png');
-        recognizeTextFromImage(imageData)
-        // sendToRecognitionModel2(imageData);
-    }, 5000); // Отправка изображения каждые 3 секунды
+    } catch (error) {
+        console.error('Error while sending the request:', error);
+        return null; // Возвращаем null в случае исключения
+    }
 }
 
 
-function sendToRecognitionModel2(imageData) {
-    const link = document.createElement('a');
-    link.href = imageData; // Присваиваем ссылке Data URL
-    link.download = 'capturedImage.png'; // Имя файла для скачивания
 
-    document.body.appendChild(link); // Добавляем ссылку в DOM
-    link.click(); // Имитируем клик для скачивания
-    document.body.removeChild(link); // Удаляем ссылку после скачивания
-    console.log("OK");
-}
+const processData = (data) => {
+    // console.log(data + "\n\n\n");
+    data.forEach(line => {
+        line.Words.forEach(word => {
+            placeTextAtCoordinates(word.Left, word.Top, word.WordText); 
+        });
+    });
+};
+
+
+
+
+
+
 
