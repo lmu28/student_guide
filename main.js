@@ -7,10 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.createElement("canvas");
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-                video.play();
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" } 
+        })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
 
             
 
@@ -86,7 +88,7 @@ function captureFrame(video, canvas) {
 
 
 async function sendBase64Image(base64Image) {
-    const url = "http://89.223.68.28:8080/api/v1/recognition";
+    const url = "https://89.223.68.28:8443/api/v1/recognition";
 
     try {
         const response = await fetch(url, {
