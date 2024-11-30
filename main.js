@@ -55,7 +55,10 @@ function placeTextAtCoordinates(x, y, text) {
 
    
     const textElement = document.createElement("div");
-    textElement.textContent = text;
+    const formattedText = text.replace(/\n/g, "<br>");
+
+
+    textElement.textContent = formattedText;
     
 
     textElement.style.position = "absolute";
@@ -69,6 +72,11 @@ function placeTextAtCoordinates(x, y, text) {
 
 
     resultsContainer.appendChild(textElement);
+
+
+    textElement.addEventListener("click", function() {
+        textElement.remove();  // Удаляет элемент
+    });
 }
 
 
@@ -88,7 +96,9 @@ function captureFrame(video, canvas) {
 
 
 async function sendBase64Image(base64Image) {
-    const url = "https://89.223.68.28:8443/api/v1/recognition";
+    const url = "https://109.196.101.157:8443/api/v1/recognition";
+
+    // const url = "https://localhost:8443/api/v1/recognition";
 
     try {
         const response = await fetch(url, {
